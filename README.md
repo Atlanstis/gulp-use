@@ -181,3 +181,56 @@ exports.default = () => {
 }
 ```
 
+## 文件操作 API
+
+Gulp 提供了几个 API 供我们对文件流进行操作。
+
+- src(): 创建读取流
+- dest(): 创建写入流
+
+```js
+const { src, dest } = require('gulp')
+
+exports.default = () => {
+  // 可以使用通配符，批量选择文件
+  return src('src/*.css').pipe(dest('dist'))
+} 
+```
+
+### gulp-clean-css
+
+压缩 css 文件。
+
+#### 安装
+
+```shell
+$ yarn add gulp-clean-css --dev
+```
+
+### gulp-rename
+
+更改文件名。
+
+#### 安装
+
+```shell
+$ yarn add gulp-rename --dev
+```
+
+### 结果
+
+```js
+const { src, dest } = require('gulp')
+const cleanCss = require('gulp-clean-css')
+const rename = require('gulp-rename')
+
+exports.default = () => {
+  // 可以使用通配符，批量选择文件
+  return src('src/*.css')
+    .pipe(cleanCss()) // 先经过转换
+    .pipe(rename({ extname: '.min.css' }))
+    .pipe(dest('dist'))
+}
+```
+
+以上，我们可以通过，Gulp 提供的方法及插件完成一个简单的构建过程，完成对 css 文件的压缩。
