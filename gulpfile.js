@@ -1,45 +1,25 @@
-// 回调函数方式
-exports.callback = (done) => {
-  console.log('callback task')
-  done()
-}
-// 回调函数方式，通知失败
-exports.callback_error = (done) => {
-  console.log('callback_error task')
-  done(new Error('task fail'))
-}
-
-// promise 方式
-exports.promise = () => {
-  console.log('promise task')
-  return Promise.resolve()
-}
-
-// promise 方式，通知失败
-exports.promise_error = () => {
-  console.log('promise_error task')
-  return Promise.reject(new Error('task fail'))
-}
-
-const timeout = (time) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, time)
-  })
-}
-
-// async 方式，Node 8 以上
-exports.async = async () => {
-  await timeout(1000)
-  console.log('async task')
-}
-
 const fs = require('fs')
+const { Transform } = require('stream')
 
-// stream 方式
-exports.stream = () => {
-  const readStream = fs.createReadStream('package.json')
-  const writeStream = fs.createWriteStream('.env.local')
-  readStream.pipe(writeStream)
-  // 监听了 stream 的结束
-  return readStream
+exports.default = () => {
+  // 文件读取流
+  const read = fs.createReadStream('normalize.css')
+  // 文件写入流
+  const write = fs.createWriteStream('normalize.min.css')
+  // 文件转换流
+  const transform = new Transform({
+    transform: (chunk, encoding, callback) => {
+      // 核心转换过程实现
+      // chunk => 读取流中读取到的内容（Buffer）
+      const input = chunk.toString()
+      const output = input.replace(/\s+/g, '').replace(/\/\*.+?\*\//g, '')
+      callback(null, output)
+    }
+  })
+
+  // 把读取出来的文件流导入写入文件流
+  read
+    .pipe(transform) // 转换
+    .pipe(write) // 写入
+  return read
 }
